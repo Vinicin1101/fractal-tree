@@ -24,18 +24,18 @@ function setup() {
     treeDiv.child(sliderLength);
     
     facText = createP(`Fac`);
-    sliderFac = createSlider(0, 80, 67);
+    sliderFac = createSlider(0, 100, 67);
     sliderFac.attribute('title', 'This can cause too lags');
     treeDiv.child(facText);
     treeDiv.child(sliderFac);
     
-    let windStrengthDiv = createDiv('WIND');
-    windStrengthDiv.addClass('wind-strength');
+    let swayStrengthDiv = createDiv('Sway');
+    swayStrengthDiv.addClass('sway-strength');
     
-    windStrengthText = createP(`Wind Strength`);
-    sliderWindStrength = createSlider(0, 100, 10);
-    windStrengthDiv.child(windStrengthText);
-    windStrengthDiv.child(sliderWindStrength);
+    swayStrengthText = createP(`SWAY`);
+    sliderSwayStrength = createSlider(0, 100, 50);
+    swayStrengthDiv.child(swayStrengthText);
+    swayStrengthDiv.child(sliderSwayStrength);
 
     let colorsDiv = createDiv('COLORS');
     colorsDiv.addClass('colors');
@@ -59,9 +59,9 @@ function setup() {
     headerDiv.addClass('header');
 
     headerDiv.child(treeDiv);
-    headerDiv.child(windStrengthDiv);
+    headerDiv.child(swayStrengthDiv);
     headerDiv.child(colorsDiv);
-    headerDiv.addClass('flex-col');
+    headerDiv.addClass('flex');
 }
 
 function draw() {
@@ -77,8 +77,8 @@ function draw() {
     // Labels
     angleText.html(`Angle: ${sliderAngle.value().toFixed(3)} rad`);
     lengthText.html(`Length: ${sliderLength.value()}px (initial branch)`);
-    facText.html(`Fac: ${sliderFac.value()/100} CAUTION!`);
-    windStrengthText.html(`Wind Strength: ${sliderWindStrength.value()/100}`);
+    facText.html(`Fac: ${sliderFac.value()/100} <b>CAUTION!</b>`);
+    swayStrengthText.html(`Sway Strength: ${sliderSwayStrength.value()/100}`);
     redText.html(`Red: ${sliderRed.value()}`);
     greenText.html(`Green: ${sliderGreen.value()}`);
     blueText.html(`Blue: ${sliderBlue.value()}`);
@@ -91,14 +91,7 @@ function branch(length) {
     var framing = frameCount * 0.05
     
     // Natural Tree movement
-    const nonWindVariation = 0.002 * sin(framing);
-    
-    // Wind
-    const windStrength = sliderWindStrength.value() / 200;
-
-    angleVariation = windStrength * sin(framing);
-
-    const calculatedWind = angleVariation + nonWindVariation;
+    let calculatedSway = sliderSwayStrength.value()/100 * sin(framing) / (length*.3);
     
     const fac = sliderFac.value()/100; // -> recursive length of next branch (the closer to 1 the more denser and lag)
 
@@ -107,13 +100,13 @@ function branch(length) {
     translate(0, -length);
 
     // Length limit (The smaller the more lag)
-    if (length > 3) {
+    if (length > 2) {
         push();
-        rotate(angle + calculatedWind);
+        rotate(angle + calculatedSway);
         branch(length * fac);
         pop();
         push();
-        rotate(-angle + calculatedWind);
+        rotate(-angle + calculatedSway);
         branch(length * fac);
         pop();
     }
